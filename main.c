@@ -58,8 +58,8 @@ int resolv_remote_host(ssh_session session, char *hostname)
 int main(int argc, char *argv[])
 {
     char hostname[100];
-    char *user = "omarpta";
-    char *password = "Mirueira01%";
+    char *user = "omarseemas";
+    char *password = "odes";
     char *host = "sdf.org";
     ssh_session my_ssh_session;
     int rc;
