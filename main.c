@@ -4,11 +4,12 @@
 #include <errno.h>
 #include <string.h>
 
-int resolv_remote_host(ssh_session session)
+int resolv_remote_host(ssh_session session, char *hostname)
 {
     ssh_channel channel;
     int rc;
     char buffer[256];
+    char *cmd;
     int nbytes;
     channel = ssh_channel_new(session);
     if (channel == NULL)
@@ -19,7 +20,10 @@ int resolv_remote_host(ssh_session session)
         ssh_channel_free(channel);
         return rc;
     }
-    rc = ssh_channel_request_exec(channel, "dig +short");
+    cmd = (char*) malloc((11 + strlen(hostname) + 1) * sizeof(char));
+    sprintf(cmd,"dig +short %s", hostname);
+    printf("%s\n", cmd);
+    rc = ssh_channel_request_exec(channel, cmd);
     if (rc != SSH_OK)
     {
         ssh_channel_close(channel);
@@ -60,7 +64,8 @@ int main(int argc, char *argv[])
     ssh_session my_ssh_session;
     int rc;
     if (argc > 1) {
-        printf("%s\n", argv[1]);
+        printf("Searching %s\n", argv[1]);
+        strcpy(hostname, argv[1]);
     } else {
         fprintf(stderr, "Please informe a hostname.\n\tEx: eping google.com\n");
         exit(-1);
@@ -91,7 +96,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-    resolv_remote_host(my_ssh_session);
+    resolv_remote_host(my_ssh_session, hostname);
 
     ssh_disconnect(my_ssh_session);
     ssh_free(my_ssh_session);
